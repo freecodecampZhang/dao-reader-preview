@@ -48,7 +48,7 @@ export default function ReaderPage({ settings, onSettingsChange, notify }: Reade
   const [bookmarks, setBookmarks] = useState<BookmarkRecord[]>([]);
   const [tocOpen, setTocOpen] = useState(searchParams.get('toc') === '1');
   const [tool, setTool] = useState<ReaderTool>('directory');
-  const [chromeVisible, setChromeVisible] = useState(true);
+  const [chromeVisible, setChromeVisible] = useState(() => searchParams.get('toc') === '1');
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [isComposing, setIsComposing] = useState(false);
