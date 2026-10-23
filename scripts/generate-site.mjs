@@ -27,9 +27,10 @@ const indexingEnabled = envValue('VITE_INDEXING_ENABLED') === 'true' && Boolean(
 const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
 const routeUrl = (route) => `${siteUrl}${route === '/' ? '/' : `${route.replace(/\/$/, '')}/`}`;
 const canonicalPath = (route) => route === '/' ? '/' : `${route.replace(/\/$/, '')}/`;
-const metaFor = ({ title, description, route, type = 'website', jsonLd }) => {
-  const robots = indexingEnabled ? 'index,follow' : 'noindex,nofollow';
-  const canonical = indexingEnabled ? `<link rel="canonical" href="${escapeHtml(routeUrl(route))}">` : '';
+const metaFor = ({ title, description, route, type = 'website', jsonLd, indexable = true }) => {
+  const pageIndexable = indexingEnabled && indexable;
+  const robots = pageIndexable ? 'index,follow' : 'noindex,nofollow';
+  const canonical = pageIndexable ? `<link rel="canonical" href="${escapeHtml(routeUrl(route))}">` : '';
   const structured = jsonLd ? `<script type="application/ld+json">${JSON.stringify(jsonLd).replace(/</g, '\\u003c')}</script>` : '';
   return `<title>${escapeHtml(title)}</title>\n    <meta name="description" content="${escapeHtml(description)}">\n    <meta name="robots" content="${robots}">\n    <meta property="og:type" content="${type}">\n    <meta property="og:title" content="${escapeHtml(title)}">\n    <meta property="og:description" content="${escapeHtml(description)}">\n    ${canonical}\n    ${structured}`;
 };
@@ -66,6 +67,8 @@ const articlesFile = JSON.parse(await readFile(path.join(root, 'src', 'content',
 const categories = [...new Map(approved.map((book) => [book.categorySlug, book.category])).entries()];
 const staticPages = [
   { route: '/', title: '古籍阅读｜本地优先的 TXT 阅读器', description: '在自己的设备上阅读古籍与小说 TXT。支持本地导入、章节目录、全文搜索、书签和阅读进度恢复。' },
+  { route: '/search', title: '搜索古籍、作品与导读｜古籍阅读', description: '搜索已审核公共书籍、原创古籍导读和经典作品介绍。私人导入 TXT 不参与网站搜索。', indexable: false },
+  { route: '/articles', title: '古籍导读与经典作品介绍｜古籍阅读', description: '阅读原创古籍版本知识、经典作品介绍与本地阅读指南。', type: 'article' },
   { route: '/category', title: '分类检索｜公共书库｜古籍阅读', description: '按分类和书名检索经审核开放的古籍与小说。' },
   { route: '/guide', title: '阅读指南｜古籍阅读', description: '从 TXT 导入到书签、翻页与本地数据管理。' },
   { route: '/about', title: '关于我们｜古籍阅读', description: '古籍阅读是一款本地优先的古籍与小说 TXT 阅读器。' },
@@ -98,17 +101,17 @@ for (const page of staticPages) {
   await writeFile(target, html, 'utf8');
 }
 // Keep private app entry points explicitly noindex when served as a route shell.
-for (const route of ['/shelf', '/reader']) {
+for (const route of ['/shelf', '/reader', '/admin']) {
   const target = path.join(dist, route.slice(1), 'index.html');
   await mkdir(path.dirname(target), { recursive: true });
   await writeFile(target, template.replace('<!-- PUBLIC_SEO_META -->', metaFor({ title: '古籍阅读', description: '本地阅读器页面。', route, type: 'website' })), 'utf8');
 }
 
-const urls = indexingEnabled ? staticPages.map((page) => routeUrl(page.route)) : [];
+const urls = indexingEnabled ? staticPages.filter((page) => page.indexable !== false).map((page) => routeUrl(page.route)) : [];
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map((url) => `  <url><loc>${escapeHtml(url)}</loc></url>`).join('\n')}\n</urlset>\n`;
 await writeFile(path.join(dist, 'sitemap.xml'), sitemap, 'utf8');
 const robots = indexingEnabled
-  ? `User-agent: *\nAllow: /\nDisallow: /shelf\nDisallow: /reader/\nSitemap: ${siteUrl}/sitemap.xml\n`
+  ? `User-agent: *\nAllow: /\nDisallow: /shelf\nDisallow: /reader/\nDisallow: /admin\nDisallow: /api/\nSitemap: ${siteUrl}/sitemap.xml\n`
   : 'User-agent: *\nDisallow: /\n';
 await writeFile(path.join(dist, 'robots.txt'), robots, 'utf8');
 
