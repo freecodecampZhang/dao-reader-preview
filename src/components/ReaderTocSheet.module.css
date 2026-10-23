@@ -1,0 +1,58 @@
+.overlay { position: fixed; z-index: 40; inset: 0; display: flex; justify-content: center; }
+.scrim { position: absolute; inset: 0; border: 0; background: rgba(36, 33, 26, .2); cursor: default; }
+.sheet { position: relative; width: min(100%, 472px); height: 100%; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; overflow: hidden; border-radius: 28px 28px 0 0; color: var(--text-main); background: var(--paper); box-shadow: 0 -10px 48px rgba(44, 38, 27, .08); }
+.sheetHeader { display: grid; align-content: start; padding: calc(clamp(54px, 8.2vh, 82px) + env(safe-area-inset-top, 0px)) 19px 11px; border-bottom: 1px solid var(--divider); }
+.handle { width: 66px; height: 18px; justify-self: center; display: grid; place-items: start center; border: 0; margin: 0 0 7px; padding: 0; background: transparent; cursor: grab; touch-action: none; }
+.handle span { width: 44px; height: 5px; border-radius: 999px; background: rgba(95,93,86,.22); }
+.handle:active { cursor: grabbing; }
+.modePill { height: 44px; display: grid; grid-template-columns: 1fr 1fr; padding: 4px; border-radius: 999px; background: var(--search-bg); }
+.modePill button { min-width: 0; display: flex; align-items: center; justify-content: center; gap: 9px; border: 0; border-radius: 999px; color: var(--text-muted); background: transparent; cursor: pointer; font-size: 15px; font-weight: 500; }
+.modePill button:first-child { justify-content: flex-start; padding-left: 16px; }
+.modePill .modeSelected { color: var(--text-main); background: var(--pill-selected); box-shadow: 0 1px 4px rgba(66, 55, 34, .03); }
+.panelHeading { display: flex; align-items: baseline; justify-content: space-between; min-height: 44px; padding: 0 6px; color: var(--text-main); font-size: 17px; font-weight: 500; }
+.panelHeading small { max-width: 65%; overflow: hidden; color: var(--text-soft); font-size: 11px; font-weight: 400; text-overflow: ellipsis; white-space: nowrap; }
+.listViewport { position: relative; min-height: 0; overflow: hidden; padding: 0 31px; }
+.chapterList, .searchResults { height: 100%; overflow-y: auto; overscroll-behavior: contain; scrollbar-color: rgba(95,93,86,.25) transparent; scrollbar-width: thin; -webkit-overflow-scrolling: touch; }
+.chapterList { padding: 8px 0 calc(26px + env(safe-area-inset-bottom, 0px)); }
+.chapterRow { width: 100%; min-height: 62px; display: flex; align-items: center; gap: 12px; border: 0; border-bottom: 1px solid var(--divider); padding: 11px 0; color: var(--text-main); background: transparent; cursor: pointer; text-align: left; }
+.chapterRow:hover:not(:disabled) { color: var(--accent); }
+.chapterRow:disabled { cursor: pointer; }
+.chapterTitle { min-width: 0; flex: 1; overflow: hidden; font-size: 17px; font-weight: 400; text-overflow: ellipsis; white-space: nowrap; }
+.chapterCurrent .chapterTitle { font-size: 17px; font-weight: 600; }
+.chapterAside { flex: 0 0 28px; display: flex; justify-content: flex-end; color: var(--text-soft); font-size: 15px; }
+.chapterLocked .chapterTitle, .chapterLocked .chapterAside { color: #97948b; }
+.currentPosition { min-height: 87px; border-bottom: 1px solid var(--divider); padding: 11px 0 8px 33px; }
+.currentJump { width: 100%; min-height: 39px; display: flex; align-items: center; gap: 11px; border: 0; padding: 0; color: var(--accent); background: transparent; cursor: pointer; text-align: left; }
+.currentJump > span { min-width: 0; flex: 1; display: grid; gap: 3px; }
+.currentJump strong { font-size: 16px; font-weight: 500; }
+.currentJump small { color: var(--text-soft); font-size: 11px; }
+.currentJump em { padding-right: 0; color: var(--text-soft); font-size: 15px; font-style: normal; }
+.addBookmark { margin: 3px 0 0 30px; border: 0; padding: 2px 4px; color: var(--text-soft); background: transparent; cursor: pointer; font-size: 13px; }
+.addBookmark:hover { color: var(--accent); }
+.goBottom { position: absolute; z-index: 3; bottom: calc(100px + env(safe-area-inset-bottom, 0px) + 18px); left: 50%; display: flex; align-items: center; gap: 7px; border: 0; padding: 10px 17px; border-radius: 999px; color: var(--text-muted); background: var(--pill-selected); box-shadow: 0 4px 18px rgba(55,45,27,.08); cursor: pointer; transform: translateX(-50%); font-size: 15px; white-space: nowrap; }
+.searchPanel { height: 100%; display: flex; flex-direction: column; overflow: hidden; }
+.searchInput { height: 43px; flex: 0 0 auto; display: flex; align-items: center; gap: 9px; margin: 13px 0 4px; border-radius: 999px; padding: 0 13px; color: var(--text-soft); background: var(--search-bg); }
+.searchInput input { min-width: 0; flex: 1; border: 0; outline: 0; color: var(--text-main); background: transparent; font-size: 13px; }
+.searchInput input::placeholder { color: var(--text-soft); }
+.searchInput button { width: 28px; height: 28px; border: 0; color: var(--text-muted); background: transparent; cursor: pointer; font-size: 21px; }
+.searchEmpty { display: grid; flex: 1; place-content: center; padding: 20px; color: var(--text-soft); font-size: 13px; text-align: center; }
+.searchResults { margin-top: 8px; }
+.resultCount { margin: 10px 0; color: var(--text-soft); font-size: 11px; }
+.searchResult { width: 100%; display: grid; gap: 7px; border: 0; border-bottom: 1px solid var(--divider); padding: 13px 0; color: var(--text-muted); background: transparent; cursor: pointer; text-align: left; }
+.searchResult strong { color: var(--text-main); font-size: 14px; font-weight: 500; }
+.searchResult span { display: -webkit-box; overflow: hidden; font-size: 12px; line-height: 1.7; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.searchResult mark { color: var(--accent); background: rgba(173,119,39,.13); }
+
+@media (min-width: 600px) {
+  .sheet { height: min(100dvh, 1024px); align-self: center; border-radius: 28px; }
+  .sheetHeader { padding-top: 74px; }
+  .sheetHeader { padding-bottom: 15px; }
+}
+
+@media (max-width: 390px) {
+  .sheet { border-radius: 25px 25px 0 0; }
+  .sheetHeader { padding-right: 16px; padding-left: 16px; }
+  .listViewport { padding-right: 23px; padding-left: 23px; }
+  .chapterTitle { font-size: 16px; }
+  .currentPosition { padding-left: 25px; }
+}

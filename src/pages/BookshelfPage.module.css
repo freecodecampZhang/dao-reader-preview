@@ -1,0 +1,119 @@
+.page { min-height: 100dvh; background: var(--paper); color: var(--text-main); }
+.header { height: 70px; display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 0 clamp(20px, 5vw, 72px); border-bottom: 1px solid var(--divider); }
+.brand, .headerActions, .importButton, .subtleButton, .folderButton { display: inline-flex; align-items: center; }
+.brand { gap: 10px; color: var(--accent); font-size: 18px; font-weight: 600; letter-spacing: .06em; }
+.headerActions { gap: 10px; margin-left: auto; }
+.importButton, .folderButton { gap: 8px; border: 0; cursor: pointer; }
+.importButton { border-radius: 999px; padding: 11px 18px; color: #fffaf0; background: #8d682e; font-size: 14px; }
+.importButton:hover { background: #795924; }
+.subtleButton { gap: 6px; border: 0; padding: 9px 12px; color: var(--text-muted); background: transparent; cursor: pointer; font-size: 13px; }
+.subtleButton:hover { color: var(--accent); }
+.hiddenInput { display: none; }
+.content { width: min(1040px, calc(100% - 40px)); margin: 0 auto; padding: 44px 0 36px; }
+.intro { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 36px; }
+.eyebrow { margin: 0 0 10px; color: var(--accent); font-size: 12px; letter-spacing: .16em; }
+.intro h1 { margin: 0; font-size: clamp(25px, 4vw, 36px); line-height: 1.45; font-weight: 500; letter-spacing: .02em; }
+.intro h1 span { color: var(--accent); }
+.description { margin: 10px 0 0; color: var(--text-muted); font-size: 14px; }
+.continueCard { width: min(300px, 34%); display: flex; align-items: center; gap: 12px; border: 1px solid var(--divider); padding: 14px 16px; border-radius: 12px; text-align: left; background: rgba(247, 241, 218, .62); cursor: pointer; }
+.continueCard:hover { border-color: rgba(173,119,39,.45); }
+.continueIcon { display: grid; flex: 0 0 38px; width: 38px; height: 38px; place-items: center; border-radius: 50%; color: var(--accent); background: rgba(173,119,39,.1); }
+.continueText { min-width: 0; display: grid; gap: 2px; }
+.continueText small, .continueText em { color: var(--text-soft); font-size: 11px; font-style: normal; }
+.continueText strong { overflow: hidden; color: var(--text-main); font-size: 14px; font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
+.continueArrow { margin-left: auto; flex: 0 0 auto; color: var(--text-soft); transform: rotate(-90deg); }
+.shelfToolbar { display: flex; align-items: center; gap: 14px; padding: 0 0 14px; border-bottom: 1px solid var(--divider); }
+.tabs { display: flex; flex: 0 0 auto; gap: 8px; }
+.tabs button { display: inline-flex; align-items: center; gap: 7px; border: 0; padding: 9px 13px; border-radius: 8px; color: var(--text-muted); background: transparent; cursor: pointer; font-size: 14px; }
+.tabs button span { color: var(--text-soft); font-size: 12px; }
+.tabs .activeTab { color: var(--accent); background: rgba(173,119,39,.1); }
+.searchBox { min-width: 120px; max-width: 310px; height: 40px; display: flex; flex: 1; align-items: center; gap: 8px; padding: 0 12px; border-radius: 999px; color: var(--text-soft); background: var(--search-bg); }
+.searchBox input { width: 100%; min-width: 0; border: 0; outline: 0; color: var(--text-main); background: transparent; font-size: 13px; }
+.searchBox input::placeholder { color: var(--text-soft); }
+.searchBox button { border: 0; color: var(--text-muted); background: transparent; cursor: pointer; font-size: 20px; }
+.folderButton { flex: 0 0 auto; gap: 7px; border: 1px solid var(--divider); padding: 9px 12px; border-radius: 8px; color: var(--text-muted); background: transparent; cursor: pointer; font-size: 13px; }
+.folderButton:hover { color: var(--accent); border-color: rgba(173,119,39,.45); }
+.bookGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; padding: 22px 0; }
+.bookCard { position: relative; display: flex; min-width: 0; gap: 14px; padding: 13px; border: 1px solid var(--divider); border-radius: 12px; background: rgba(247,241,218,.26); transition: border-color .18s, background .18s; }
+.bookCard:hover { border-color: rgba(173,119,39,.4); background: rgba(247,241,218,.5); }
+.bookCover { position: relative; display: flex; flex: 0 0 78px; width: 78px; min-height: 108px; flex-direction: column; align-items: center; justify-content: center; gap: 8px; overflow: hidden; border: 1px solid rgba(96,72,35,.13); border-radius: 5px 10px 10px 5px; color: #66502c; background: #e9dfc8; cursor: pointer; box-shadow: inset 4px 0 rgba(99,75,40,.08), 0 3px 6px rgba(54,43,23,.06); }
+.bookCover::after { position: absolute; inset: 0 4px 0 auto; width: 1px; content: ''; background: rgba(88,65,35,.08); }
+.cover1 { color: #574a34; background: #e5e1d3; }
+.cover2 { color: #795743; background: #ebddce; }
+.cover3 { color: #68522f; background: #e7e3d5; }
+.cover4 { color: #66533e; background: #eadfca; }
+.coverSeal { position: absolute; top: 7px; right: 7px; display: grid; width: 16px; height: 16px; place-items: center; border: 1px solid currentColor; border-radius: 2px; font-size: 9px; }
+.coverTitle { display: -webkit-box; max-width: 60px; overflow: hidden; color: inherit; font-size: 11px; line-height: 1.55; text-align: center; -webkit-box-orient: vertical; -webkit-line-clamp: 3; }
+.bookDetails { min-width: 0; flex: 1; align-self: center; padding-right: 24px; }
+.bookName { display: block; max-width: 100%; overflow: hidden; border: 0; padding: 0; color: var(--text-main); background: transparent; cursor: pointer; font-size: 15px; font-weight: 600; text-align: left; text-overflow: ellipsis; white-space: nowrap; }
+.bookName:hover { color: var(--accent); }
+.bookDetails p { margin: 7px 0 13px; overflow: hidden; color: var(--text-soft); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.progressTrack { height: 3px; overflow: hidden; border-radius: 999px; background: rgba(95,93,86,.12); }
+.progressTrack span { display: block; height: 100%; border-radius: inherit; background: var(--accent); transition: width .2s; }
+.bookMeta { display: flex; justify-content: space-between; gap: 8px; margin-top: 7px; color: var(--text-soft); font-size: 10px; }
+.bookMeta span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cardActions { position: absolute; top: 10px; right: 9px; display: flex; flex-direction: column; gap: 4px; }
+.cardActions button { display: grid; width: 28px; height: 28px; place-items: center; border: 0; border-radius: 6px; color: var(--text-soft); background: transparent; cursor: pointer; }
+.cardActions button:hover { color: var(--accent); background: rgba(173,119,39,.08); }
+.stateMessage { grid-column: 1 / -1; padding: 30px 8px; color: var(--text-muted); text-align: center; }
+.emptyState { grid-column: 1 / -1; display: flex; min-height: 210px; flex-direction: column; align-items: center; justify-content: center; gap: 10px; color: var(--text-soft); text-align: center; }
+.emptyState strong { color: var(--text-main); font-size: 16px; font-weight: 500; }
+.emptyState span { max-width: 420px; font-size: 13px; line-height: 1.7; }
+.emptyState button { display: inline-flex; align-items: center; gap: 6px; margin-top: 5px; border: 1px solid var(--divider); padding: 9px 14px; border-radius: 8px; color: var(--accent); background: transparent; cursor: pointer; font-size: 13px; }
+.importStatus { display: flex; align-items: center; gap: 9px; padding: 12px 4px 0; color: var(--text-muted); font-size: 13px; }
+.spinner { width: 15px; height: 15px; border: 2px solid var(--divider); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.catalogPanel { padding: 18px 0; }
+.folderSelect { position: relative; display: flex; width: min(360px, 100%); align-items: center; gap: 12px; margin: 0 0 10px; color: var(--text-muted); font-size: 13px; }
+.folderSelect select { flex: 1; appearance: none; border: 1px solid var(--divider); padding: 10px 34px 10px 12px; border-radius: 8px; color: var(--text-main); background: var(--paper); font-size: 13px; }
+.folderSelect svg { position: absolute; right: 11px; pointer-events: none; }
+.catalogList { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px 24px; }
+.catalogRow { min-width: 0; display: flex; align-items: center; gap: 11px; border: 0; border-bottom: 1px solid var(--divider); padding: 12px 5px; color: var(--text-main); background: transparent; cursor: pointer; text-align: left; }
+.catalogRow:hover { background: rgba(247,241,218,.35); }
+.favoriteRow { min-width: 0; display: flex; align-items: center; border-bottom: 1px solid var(--divider); }
+.favoriteRow .catalogRow { min-width: 0; flex: 1; border-bottom: 0; }
+.removeFavorite { display: grid; flex: 0 0 38px; width: 38px; height: 38px; place-items: center; border: 0; border-radius: 50%; color: var(--text-soft); background: transparent; cursor: pointer; }
+.removeFavorite:hover { color: #8b483e; background: rgba(139,72,62,.08); }
+.catalogIcon { display: grid; flex: 0 0 34px; height: 34px; place-items: center; border-radius: 50%; color: var(--accent); background: rgba(173,119,39,.09); }
+.catalogText { min-width: 0; flex: 1; display: grid; gap: 4px; }
+.catalogText strong, .catalogText small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.catalogText strong { font-size: 13px; font-weight: 500; }
+.catalogText small { color: var(--text-soft); font-size: 10px; }
+.catalogOpen { flex: 0 0 auto; color: var(--accent); font-size: 11px; }
+.limitNote { color: var(--text-soft); font-size: 12px; text-align: center; }
+.footer { display: flex; justify-content: space-between; gap: 12px; border-top: 1px solid var(--divider); padding: 15px clamp(20px, 5vw, 72px); color: var(--text-soft); font-size: 11px; }
+.footer span:first-child { display: inline-flex; align-items: center; gap: 6px; }
+.footer svg { color: var(--accent); }
+
+@media (max-width: 700px) {
+  .header { height: 60px; padding: 0 16px; }
+  .brand { font-size: 16px; }
+  .headerActions { gap: 4px; }
+  .subtleButton { padding: 8px; }
+  .importButton { padding: 10px 12px; font-size: 13px; }
+  .content { width: calc(100% - 32px); padding-top: 28px; }
+  .intro { display: block; margin-bottom: 23px; }
+  .intro h1 { font-size: 25px; }
+  .description { font-size: 12px; }
+  .continueCard { width: 100%; margin-top: 17px; }
+  .shelfToolbar { flex-wrap: wrap; gap: 9px; }
+  .tabs { width: 100%; }
+  .tabs button { flex: 1; justify-content: center; }
+  .searchBox { order: 2; max-width: none; }
+  .folderButton { order: 3; padding: 10px; }
+  .bookGrid { grid-template-columns: 1fr; gap: 9px; padding-top: 15px; }
+  .bookCard { padding: 10px; gap: 11px; }
+  .bookCover { flex-basis: 66px; width: 66px; min-height: 94px; }
+  .bookDetails { padding-right: 22px; }
+  .bookName { font-size: 14px; }
+  .catalogList { grid-template-columns: 1fr; }
+  .footer { padding: 13px 16px; font-size: 10px; }
+}
+
+@media (max-width: 390px) {
+  .content { width: calc(100% - 28px); }
+  .header { padding: 0 14px; }
+  .subtleButton span { display: none; }
+  .folderButton { font-size: 12px; }
+  .footer { padding-right: 14px; padding-left: 14px; }
+}

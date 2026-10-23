@@ -1,0 +1,14 @@
+.empty { min-height: 240px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 9px; color: var(--text-soft); text-align: center; }
+.empty strong { color: var(--text-main); font-size: 15px; font-weight: 500; }
+.empty span { max-width: 250px; font-size: 12px; line-height: 1.7; }
+.list { display: grid; }
+.item { position: relative; border-bottom: 1px solid var(--divider); }
+.jump { width: 100%; min-height: 78px; display: flex; align-items: center; gap: 12px; border: 0; padding: 12px 34px 12px 0; color: var(--text-muted); background: transparent; cursor: pointer; text-align: left; }
+.jump:hover { color: var(--accent); }
+.marker { flex: 0 0 34px; display: grid; width: 34px; height: 34px; place-items: center; border-radius: 50%; color: var(--accent); background: rgba(173,119,39,.1); }
+.text { min-width: 0; flex: 1; display: grid; gap: 3px; }
+.text strong { overflow: hidden; color: var(--text-main); font-size: 14px; font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
+.text small { overflow: hidden; color: var(--text-muted); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.text time { color: var(--text-soft); font-size: 10px; }
+.remove { position: absolute; top: 25px; right: 0; display: grid; width: 30px; height: 30px; place-items: center; border: 0; border-radius: 50%; color: var(--text-soft); background: transparent; cursor: pointer; }
+.remove:hover { color: #a55242; background: rgba(165,82,66,.08); }

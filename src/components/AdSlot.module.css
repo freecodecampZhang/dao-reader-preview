@@ -1,0 +1,7 @@
+.preview { width: min(100% - 32px, 980px); min-height: 76px; margin: 22px auto; border: 1px dashed rgba(127, 112, 83, .35); border-radius: 12px; padding: 10px 14px; color: var(--text-soft); background: rgba(247, 241, 218, .26); }
+.preview > span, .label { display: inline-block; color: var(--text-soft); font: 10px/1.2 system-ui, sans-serif; letter-spacing: .08em; }
+.preview p { margin: 14px 0 6px; font: 12px/1.5 system-ui, sans-serif; text-align: center; }
+.slot { width: min(100% - 32px, 980px); margin: 24px auto; padding: 10px 12px; border: 1px solid var(--divider); border-radius: 10px; overflow: hidden; }
+.mountPoint { min-height: 0; width: 100%; }
+.adSense { display: block; width: 100%; min-height: 90px; }
+.failure { margin: 14px 0; color: var(--text-soft); font-size: 12px; text-align: center; }
