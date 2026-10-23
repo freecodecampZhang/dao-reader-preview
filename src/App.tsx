@@ -2,13 +2,14 @@ import { useCallback, useEffect, useState } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import BookshelfPage from './pages/BookshelfPage';
 import ReaderPage from './pages/ReaderPage';
+import AdminPage from './pages/AdminPage';
 import { getBook, getPosition, saveBook, savePosition } from './services/bookStorage';
 import { readReaderSettings, writeReaderSettings } from './services/readerSettings';
 import { createDemoBook } from './utils/demoBook';
 import type { ReaderSettings } from './types';
 import styles from './app.module.css';
 import SiteLayout from './site/SiteLayout';
-import { ArticlePage, CatalogPage, GuidePage, HomePage, InformationPage, PublicBookPage } from './site/PublicPages';
+import { ArticleIndexPage, ArticlePage, CatalogPage, GuidePage, HomePage, InformationPage, PublicBookPage, SearchPage } from './site/PublicPages';
 
 export default function App() {
   const [settings, setSettings] = useState<ReaderSettings>(readReaderSettings);
@@ -66,6 +67,8 @@ export default function App() {
           <Route path="/shelf" element={<BookshelfPage notify={notify} />} />
           <Route path="/category" element={<CatalogPage />} />
           <Route path="/category/:categorySlug" element={<CatalogPage />} />
+          <Route path="/search" element={<SearchPage />} />
+          <Route path="/articles" element={<ArticleIndexPage />} />
           <Route path="/books/:slug" element={<PublicBookPage />} />
           <Route path="/articles/:slug" element={<ArticlePage />} />
           <Route path="/guide" element={<GuidePage />} />
@@ -75,6 +78,7 @@ export default function App() {
           <Route path="/terms" element={<InformationPage />} />
         </Route>
         <Route path="/reader/:bookId" element={<ReaderPage settings={settings} onSettingsChange={updateSettings} notify={notify} />} />
+        <Route path="/admin" element={<AdminPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       {toast && <div className={styles.toast} role="status">{toast}</div>}

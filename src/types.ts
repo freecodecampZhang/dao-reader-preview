@@ -63,6 +63,13 @@ export interface PublicCatalogBook {
   slug: string;
   title: string;
   author?: string;
+  dynasty?: string;
+  textForm?: '简体' | '繁体';
+  editionType?: '古籍 TXT' | '校勘本' | '原版影印';
+  baseEdition?: string;
+  fullTextConfirmed?: boolean;
+  originalSource?: string;
+  publicLicense?: string;
   category: string;
   categorySlug: string;
   description: string;
