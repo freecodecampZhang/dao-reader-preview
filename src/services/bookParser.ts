@@ -11,6 +11,10 @@ function parseWithWorker(payload: { buffer?: ArrayBuffer; text?: string }, trans
         reject(new Error(event.data.error || 'TXT 解析失败'));
         return;
       }
+      if (!event.data.text.trim()) {
+        reject(new Error('TXT 文件没有可读取的文字内容。'));
+        return;
+      }
       resolve({ text: event.data.text, encoding: event.data.encoding || 'UTF-8', chapters: event.data.chapters });
     };
     worker.onerror = () => { worker.terminate(); reject(new Error('TXT 解析器启动失败，请刷新页面后重试。')); };

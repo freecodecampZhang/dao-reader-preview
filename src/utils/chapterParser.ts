@@ -59,6 +59,26 @@ export function parseBookText(input: string): Chapter[] {
   return chapters;
 }
 
+/**
+ * Parse chapters for reading. If headings consume the entire file (or a legacy
+ * parser stored only empty chapter bodies), keep the complete source readable
+ * as one raw-text chapter instead of opening a blank page.
+ */
+export function parseReadableBookText(input: string): Chapter[] {
+  const text = input.replace(/\r\n?/g, '\n').replace(/^\uFEFF/, '');
+  const chapters = parseBookText(text);
+  if (chapters.some((chapter) => chapter.content.trim().length > 0) || !text.trim()) return chapters;
+
+  return [{
+    id: chapterId(0, '原文'),
+    title: '原文',
+    content: text,
+    startOffset: 0,
+    endOffset: text.length,
+    page: 1,
+  }];
+}
+
 export function estimateChapterPage(chapter: Chapter): number {
   return Math.max(1, chapter.page || Math.floor(chapter.startOffset / 800) + 1);
 }

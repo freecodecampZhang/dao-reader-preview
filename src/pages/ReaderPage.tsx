@@ -7,7 +7,7 @@ import AdSlot from '../components/AdSlot';
 import type { ReaderTool } from '../components/ReaderToolbar';
 import type { BookmarkRecord, BookRecord, ReaderSettings, ReadingPosition } from '../types';
 import { getBook, getBookmarks, getPosition, makeId, removeBookmark, saveBook, saveBookmark, savePosition } from '../services/bookStorage';
-import { parseBufferInWorker } from '../services/bookParser';
+import { parseBufferInWorker, parseTextInWorker } from '../services/bookParser';
 import { loadApprovedCatalog } from '../services/publicCatalog';
 import { SeoMeta } from '../site/SiteLayout';
 import styles from './ReaderPage.module.css';
@@ -100,6 +100,12 @@ export default function ReaderPage({ settings, onSettingsChange, notify }: Reade
           await saveBook(loaded);
         }
         if (!loaded) throw new Error('找不到这本书，请返回书架重新打开。');
+        if (!loaded.chapters?.some((chapter) => chapter.content?.trim())) {
+          if (!loaded.content?.trim()) throw new Error('这本书保存的 TXT 正文为空，请从原始文件重新导入。');
+          const parsed = await parseTextInWorker(loaded.content);
+          loaded = { ...loaded, chapters: parsed.chapters };
+          await saveBook(loaded);
+        }
         const [position, savedBookmarks] = await Promise.all([getPosition(bookId), getBookmarks(bookId)]);
         if (!active) return;
         setBook(loaded);
