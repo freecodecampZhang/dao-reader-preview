@@ -59,7 +59,7 @@ export interface ReaderSettings {
 }
 
 /** Public book metadata is deliberately separate from private IndexedDB books. */
-export interface PublicCatalogBook {
+export interface PublicCatalogMetadata {
   slug: string;
   title: string;
   author?: string;
@@ -74,15 +74,37 @@ export interface PublicCatalogBook {
   categorySlug: string;
   description: string;
   contentFile: string;
+  /** Original uploaded filename used by the build script to resolve draft sources. */
+  sourceFile?: string;
+  dynasty?: string;
+  textForm?: '简体' | '繁体' | '';
+  editionType?: '古籍 TXT' | '校勘本' | '原版影印' | '';
+  baseEdition?: string;
+  fullTextConfirmed?: boolean;
+  originalSource?: string;
+  publicLicense?: string;
+}
+
+export interface PublicCatalogBook extends PublicCatalogMetadata {
   status: 'approved';
   rightsConfirmed: true;
   commercialRightsConfirmed: true;
   publicationApproved: true;
 }
 
+/** Draft records may be kept in the source manifest, but are never served publicly. */
+export interface PublicCatalogDraft extends PublicCatalogMetadata {
+  status: 'draft';
+  rightsConfirmed: false;
+  commercialRightsConfirmed: false;
+  publicationApproved: false;
+}
+
+export type PublicCatalogEntry = PublicCatalogBook | PublicCatalogDraft;
+
 export interface PublicCatalogManifest {
   version: 1;
-  books: PublicCatalogBook[];
+  books: PublicCatalogEntry[];
 }
 
 export interface CatalogFavorite {

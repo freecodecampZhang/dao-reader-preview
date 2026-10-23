@@ -8,6 +8,7 @@
     "check:functions": "tsc --noEmit -p tsconfig.functions.json",
     "start": "node server.js",
     "preview": "vite preview",
+    "catalog:generate": "node scripts/generate-library-catalog.mjs",
     "test": "vitest run"
   },
   "dependencies": {

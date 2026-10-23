@@ -46,25 +46,31 @@ for (const item of candidates) {
   if (!item || typeof item !== 'object' || !slugPattern.test(item.slug || '') || seen.has(item.slug)) continue;
   if (typeof item.title !== 'string' || !item.title.trim() || typeof item.description !== 'string' || !item.description.trim()) continue;
   if (typeof item.category !== 'string' || !item.category.trim() || !slugPattern.test(item.categorySlug || '')) continue;
-  if (item.status !== 'approved' || item.rightsConfirmed !== true || item.commercialRightsConfirmed !== true || item.publicationApproved !== true) continue;
   if (item.contentFile !== `library/${item.slug}.txt`) continue;
-  try { await readFile(path.join(publicRoot, 'library', `${item.slug}.txt`)); } catch { continue; }
+  const sourceFile = item.sourceFile ?? `${item.slug}.txt`;
+  if (typeof sourceFile !== 'string' || sourceFile !== path.basename(sourceFile) || sourceFile.includes('/') || sourceFile.includes('\\') || !/\.txt$/i.test(sourceFile)) continue;
+  if (item.status !== 'approved' || item.rightsConfirmed !== true || item.commercialRightsConfirmed !== true || item.publicationApproved !== true) continue;
+  try { await readFile(path.join(publicRoot, 'library', sourceFile)); } catch { continue; }
   seen.add(item.slug);
-  approved.push({ ...item });
+  approved.push({ item: { ...item }, sourceFile });
 }
 
 // Vite copies public/ wholesale; remove any unlisted text so source files cannot
 // accidentally become publicly reachable. Only reviewed manifest rows are copied.
 const outLibrary = path.join(dist, 'library');
 await rm(outLibrary, { recursive: true, force: true });
-for (const book of approved) {
+for (const { item, sourceFile } of approved) {
   await mkdir(outLibrary, { recursive: true });
-  await copyFile(path.join(publicRoot, 'library', `${book.slug}.txt`), path.join(outLibrary, `${book.slug}.txt`));
+  await copyFile(path.join(publicRoot, 'library', sourceFile), path.join(outLibrary, `${item.slug}.txt`));
 }
-await writeFile(path.join(dist, 'catalog.json'), `${JSON.stringify({ version: 1, books: approved }, null, 2)}\n`, 'utf8');
+const publicBooks = approved.map(({ item }) => {
+  const { sourceFile: _sourceFile, ...book } = item;
+  return book;
+});
+await writeFile(path.join(dist, 'catalog.json'), `${JSON.stringify({ version: 1, books: publicBooks }, null, 2)}\n`, 'utf8');
 
 const articlesFile = JSON.parse(await readFile(path.join(root, 'src', 'content', 'articles.json'), 'utf8'));
-const categories = [...new Map(approved.map((book) => [book.categorySlug, book.category])).entries()];
+const categories = [...new Map(publicBooks.map((book) => [book.categorySlug, book.category])).entries()];
 const staticPages = [
   { route: '/', title: '古籍阅读｜本地优先的 TXT 阅读器', description: '在自己的设备上阅读古籍与小说 TXT。支持本地导入、章节目录、全文搜索、书签和阅读进度恢复。' },
   { route: '/search', title: '搜索古籍、作品与导读｜古籍阅读', description: '搜索已审核公共书籍、原创古籍导读和经典作品介绍。私人导入 TXT 不参与网站搜索。', indexable: false },
@@ -83,7 +89,7 @@ const staticPages = [
     jsonLd: { '@context': 'https://schema.org', '@type': 'Article', headline: article.title, description: article.description },
   })),
   ...categories.map(([slug, name]) => ({ route: `/category/${slug}`, title: `${name}｜公共书库｜古籍阅读`, description: `浏览公共书库中的${name}内容。` })),
-  ...approved.map((book) => ({
+  ...publicBooks.map((book) => ({
     route: `/books/${book.slug}`,
     title: `${book.title}｜古籍阅读`,
     description: book.description,
@@ -115,4 +121,4 @@ const robots = indexingEnabled
   : 'User-agent: *\nDisallow: /\n';
 await writeFile(path.join(dist, 'robots.txt'), robots, 'utf8');
 
-console.log(`SEO 路由生成完成：${staticPages.length} 个公开页面，${approved.length} 本已审核公共书籍；索引${indexingEnabled ? '已启用' : '默认关闭'}。`);
+console.log(`SEO 路由生成完成：${staticPages.length} 个公开页面，${publicBooks.length} 本已审核公共书籍；索引${indexingEnabled ? '已启用' : '默认关闭'}。`);
