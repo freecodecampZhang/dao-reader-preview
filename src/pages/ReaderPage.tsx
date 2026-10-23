@@ -7,7 +7,7 @@ import AdSlot from '../components/AdSlot';
 import type { ReaderTool } from '../components/ReaderToolbar';
 import type { BookmarkRecord, BookRecord, ReaderSettings, ReadingPosition } from '../types';
 import { getBook, getBookmarks, getPosition, makeId, removeBookmark, saveBook, saveBookmark, savePosition } from '../services/bookStorage';
-import { parseTextInWorker } from '../services/bookParser';
+import { parseBufferInWorker } from '../services/bookParser';
 import { loadApprovedCatalog } from '../services/publicCatalog';
 import { SeoMeta } from '../site/SiteLayout';
 import styles from './ReaderPage.module.css';
@@ -82,8 +82,9 @@ export default function ReaderPage({ settings, onSettingsChange, notify }: Reade
           if (!publicBook) throw new Error('这本书不在当前公开书库中，可能已下架或尚未通过审核。');
           const response = await fetch(`/${publicBook.contentFile}`, { headers: { Accept: 'text/plain' } });
           if (!response.ok) throw new Error('此书正文暂时无法读取，请稍后再试。');
-          const text = await response.text();
-          const parsed = await parseTextInWorker(text);
+          const buffer = await response.arrayBuffer();
+          const size = buffer.byteLength;
+          const parsed = await parseBufferInWorker(buffer);
           loaded = {
             id: bookId,
             name: publicBook.title,
@@ -92,7 +93,7 @@ export default function ReaderPage({ settings, onSettingsChange, notify }: Reade
             catalogPath: publicBook.contentFile,
             content: parsed.text,
             chapters: parsed.chapters,
-            size: new TextEncoder().encode(text).byteLength,
+            size,
             createdAt: Date.now(),
             updatedAt: Date.now(),
           };
