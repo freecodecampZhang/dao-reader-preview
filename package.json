@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && vite build && node scripts/generate-site.mjs",
+    "build": "tsc --noEmit && tsc --noEmit -p tsconfig.functions.json && vite build && node scripts/generate-site.mjs",
+    "check:functions": "tsc --noEmit -p tsconfig.functions.json",
     "start": "node server.js",
     "preview": "vite preview",
     "test": "vitest run"

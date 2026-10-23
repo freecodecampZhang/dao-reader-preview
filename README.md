@@ -21,9 +21,11 @@ npm run start
 ## 本地书与公共书库
 
 - “我的书架”中导入的 TXT、解析章节、书签和进度保存在当前浏览器的 IndexedDB，不会上传到服务器。
-- 公共书籍来自 `public/catalog.json`。只有 `status: approved` 且 `rightsConfirmed`、`commercialRightsConfirmed`、`publicationApproved` 全为 `true`，并且正文位于 `public/library/<slug>.txt` 的条目才会被构建发布。
+- 已审核的旧公共书籍来自 `public/catalog.json`；管理员新增书籍通过 Cloudflare Pages Functions + D1 + 私有 R2 管理。公共访问只返回已发布且 `rightsConfirmed`、`commercialRightsConfirmed`、`publicationApproved` 全为真的条目。
 - 当前清单为空。不要把私人导入的 TXT 或未经许可的第三方小说加入 `public/library` 或公共清单。构建器仅将通过发布门槛的公共正文复制到 `dist/library`。
-- 收藏的公共书籍保存在本地 IndexedDB；阅读公共书籍时，浏览器只会获取对应已批准静态 TXT 并保存到本地书架。
+- 普通访客的个人导入仍留在 IndexedDB；管理员上传的内容先进入私有草稿，审核发布前不可被公开 API 读取。收藏和阅读进度继续保存在访客本地 IndexedDB。
+- “古籍导读”和全站搜索只查找本站原创文章与已经审核的公共书目，不会搜索或上传访客本地 TXT。
+- 管理后台位于 `/admin`，只供管理员直接访问，可预览草稿正文、编辑书目信息、审核发布与撤下；Cloudflare 资源与密钥配置见 [PUBLIC_LIBRARY_ADMIN.md](./PUBLIC_LIBRARY_ADMIN.md)。
 
 ## 阅读功能
 
@@ -31,12 +33,12 @@ npm run start
 
 ## 站点及上线
 
-- 首页：`/`；本地书架：`/shelf`；公共书库：`/category`；公开书籍详情：`/books/:slug`。
-- 阅读指南与文章：`/guide`、`/articles/:slug`；关于、联系、隐私和服务条款：`/about`、`/contact`、`/privacy`、`/terms`。
+- 首页：`/`；本地书架：`/shelf`；公共书库：`/category`；全站搜索：`/search`；古籍导读：`/articles` 与 `/articles/:slug`；公开书籍详情：`/books/:slug`。
+- 阅读指南：`/guide`；关于、联系、隐私和服务条款：`/about`、`/contact`、`/privacy`、`/terms`。
 - 发布前默认禁止搜索引擎索引。真实 HTTPS 域名配置 `VITE_SITE_URL` 并经运营者确认后，才设置 `VITE_INDEXING_ENABLED=true`。
 - 广告默认关闭，开发环境只显示无脚本占位。生产广告需要真实平台配置、用户偏好和所需 CMP 同意；仓库没有 Publisher ID、广告位 ID、账号或审核结果。
 
-部署步骤见 [DEPLOYMENT.md](./DEPLOYMENT.md)，广告配置见 [AD_MONETIZATION.md](./AD_MONETIZATION.md)，发布前工作见 [PRELAUNCH_CHECKLIST.md](./PRELAUNCH_CHECKLIST.md)。
+部署和日常发布步骤见 [DEPLOYMENT.md](./DEPLOYMENT.md)，公共书库审核与上传见 [PUBLIC_LIBRARY_ADMIN.md](./PUBLIC_LIBRARY_ADMIN.md)，广告配置见 [AD_MONETIZATION.md](./AD_MONETIZATION.md)，上线前检查见 [PRELAUNCH_CHECKLIST.md](./PRELAUNCH_CHECKLIST.md)。
 
 ## 检查
 

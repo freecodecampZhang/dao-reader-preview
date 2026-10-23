@@ -1,87 +1,89 @@
-# Cloudflare Pages 部署
+# Cloudflare Pages 部署与运维
 
-## 构建产物
+本文针对仓库 `freecodecampZhang/dao-reader-preview`。GitHub 仓库的默认生产分支是 `main`；Cloudflare Pages 应连接该仓库的 `main` 分支。
 
-使用 Node.js 22 和 npm：
+## 先确认部署目标
 
-```bash
-npm ci
-npm test
-npm run build
-```
+Cloudflare 现在同时提供 Pages 和 Workers 的 Git 部署入口。此项目是静态 Vite 网站，要创建 **Pages 项目**：在 **Workers & Pages → Create application** 页面，选择底部 **Continue to Pages**，再选择 **Connect to Git**。不要从通用的 **Connect GitHub** / Workers Builds 流程创建 Worker。
 
-Pages 构建设置：
+部署后应能看到 Pages 项目及 `https://<项目名>.pages.dev` 域名。若项目详情在 Workers 服务页面、发布命令是 `npx wrangler deploy`、域名是 `workers.dev`，那是 Worker 部署，不是本文配置的 Pages 站点。Cloudflare 的入口说明见[Pages Git 集成指南](https://developers.cloudflare.com/pages/configuration/git-integration/)及[Workers Builds 文档](https://developers.cloudflare.com/workers/ci-cd/builds/)。
 
-- Framework preset：`React` / `Vite`
-- Build command：`npm run build`
-- Build output directory：`dist`
-- Root directory：仓库根目录
-- Node version：`22`
+## 首次创建 Pages 项目
 
-构建包括 TypeScript 检查、Vite 生产包和 `scripts/generate-site.mjs`。末尾脚本只从空的/审核通过的 `public/catalog.json` 生成可公开目录、页面 SEO 壳、站点地图和 robots 文件。项目根目录的 TXT 不进入 `dist`。本站没有后端上传 API。
+1. 打开 Cloudflare Dashboard 的 **Workers & Pages**，选中目标账号。
+2. 选择 **Create application → Continue to Pages → Connect to Git**，按提示完成 GitHub 授权。
+3. 选择 `freecodecampZhang/dao-reader-preview`，项目名填写 `dao-reader-preview`（若名称被占用则使用可用名称），生产分支选择 `main`。
+4. 配置构建：
 
-## GitHub 自动部署
+   | 设置 | 值 |
+   | --- | --- |
+   | Framework preset | React (Vite) |
+   | Root directory | `/`（仓库根目录） |
+   | Build command | `npm run build` |
+   | Build output directory | `dist` |
+   | Node.js version | `22` |
 
-推荐在 Cloudflare Pages 中直接关联 GitHub 仓库。关联时选择 `master` 作为生产分支，并配置上面的构建命令、输出目录和 Node 版本。该方式由 Cloudflare 自动构建，无需创建 Cloudflare API Token。
+5. 保存并等待首个部署完成。在项目的 **Deployments** 中确认构建成功，并打开 `*.pages.dev` 地址检查首页。
 
-仓库另附 `.github/workflows/pages-deployment.yml` 作为 GitHub Actions 发布方案，在 `master` 或 `main` 推送时依次执行 `npm ci`、`npm test`、`npm run build`，然后通过 Wrangler 发布 `dist`。仅在选择 Actions 方案时，才需要在 GitHub 仓库设置中配置：
+Pages 的 Vite 构建命令和输出目录可参考[Cloudflare Pages 构建配置](https://developers.cloudflare.com/pages/configuration/build-configuration/)。
 
-**Actions secrets**
+## 日常发布
 
-- `CLOUDFLARE_API_TOKEN`：仅授予目标账户 Pages 编辑权限的 Token。
-- `CLOUDFLARE_ACCOUNT_ID`：从 Cloudflare 账户面板读取。
+Cloudflare Pages Git 集成会在 `main` 有新提交时构建并发布生产站点；其他分支通常生成预览部署。常规发布流程：
 
-**Actions variables**
+1. 在本地完成修改，并运行 `npm ci`、`npm test`、`npm run build`。
+2. 将已审阅的提交合并或推送到 GitHub 的 `main` 分支。
+3. 在 Cloudflare **Workers & Pages → dao-reader-preview → Deployments** 查看构建状态和日志。
+4. 构建成功后打开最新 `pages.dev` 部署地址，确认关键页面与路由。
 
-- `CF_PAGES_PROJECT_NAME`：Cloudflare Pages 项目名。未配置时部署 Job 会跳过。
-- `VITE_SITE_URL`、`VITE_INDEXING_ENABLED`：站点正式域名与索引开关。
-- 广告与联系变量：仅在真实配置准备好之后设置，详见 [AD_MONETIZATION.md](./AD_MONETIZATION.md)。
+Cloudflare Git 集成不需要 Cloudflare API Token。项目已有 `.github/workflows/pages-deployment.yml` 作为可选的 GitHub Actions 发布方案，但默认因缺少 `CF_PAGES_PROJECT_NAME` 而跳过；**不要同时启用 Actions 发布与 Cloudflare Git 集成**，避免一次提交产生两套部署。
 
-使用 Cloudflare Git 集成时，Production branch 设为 `master`，并在 Pages 项目环境变量中配置相同的 `VITE_*` 变量。不要同时启用 Actions 发布和 Cloudflare Git 集成，以免重复部署。
+### 可选：改用 GitHub Actions 发布
 
-## 环境变量和索引
+仅在明确选择 Actions 而非 Cloudflare 原生 Git 集成时配置：
 
-仓库中的 `.env.example` 只列变量名，没有任何账号或广告 ID。正式发布前，在 Cloudflare Pages 的 Production 环境配置：
+- GitHub Actions secret `CLOUDFLARE_API_TOKEN`：只授予目标账号 Pages 编辑权限。
+- GitHub Actions secret `CLOUDFLARE_ACCOUNT_ID`：从 Cloudflare 账号信息读取。
+- GitHub Actions variable `CF_PAGES_PROJECT_NAME`：Pages 项目名，例如 `dao-reader-preview`。未设置时部署步骤会跳过。
+- 如需公开站点、广告或联系方式配置，再按下文及 [AD_MONETIZATION.md](./AD_MONETIZATION.md) 设置对应变量。
+
+该工作流在 `main` 或 `master` 推送时运行 `npm ci`、`npm test`、`npm run build`，再用 Wrangler 发布 `dist`。不要把 Token 放入源码、聊天、`.env` 提交或 Cloudflare Pages 普通变量中。
+
+## 构建与内容边界
+
+项目使用 Node.js 22。`npm run build` 会执行前端与 Pages Functions TypeScript 检查，再运行 Vite 和 `scripts/generate-site.mjs` 生成 `dist`。生成脚本只处理公开页面和审核过的 `public/catalog.json` 内容；仓库根目录中的 TXT、用户导入 TXT、阅读进度与书架数据不属于公开构建内容。普通用户本地导入没有上传 API；另有一个独立的管理员批量收录流程，先写入私有 R2 草稿，需完成审核后才能发布。设置 Pages Functions 时请按 [PUBLIC_LIBRARY_ADMIN.md](./PUBLIC_LIBRARY_ADMIN.md) 建立 D1 / R2 bindings 和管理员 secrets。
+
+生产构建变量在 Cloudflare Pages 项目 **Settings → Environment variables → Production** 配置；预览环境使用独立 Preview 变量。`.env.example` 仅列变量名，不含任何账号或广告 ID。
 
 ```text
-VITE_SITE_URL=https://你的真实域名
-VITE_INDEXING_ENABLED=true
+VITE_SITE_URL=https://你的正式域名
+VITE_INDEXING_ENABLED=false
+VITE_CONTACT_EMAIL=真实可用的联系邮箱
 ```
 
-第一次部署、预览环境、尚未完成内容/法律审核时保持 `VITE_INDEXING_ENABLED=false`。默认构建会生成 `Disallow: /`，不生成可索引 URL；没有 HTTPS 站点根域名时即使误打开该开关，构建器仍禁用索引。正式发布后检查 `https://你的真实域名/robots.txt` 与 `/sitemap.xml`。站点地图只包含公开页面、文章，以及同时通过权利标记与文件存在校验的公共书籍；不包含 `/shelf`、`/reader` 或本地导入书籍。
+只有在正式 HTTPS 域名、公开内容审核及法律检查完成后，才将 `VITE_INDEXING_ENABLED` 改为 `true`。索引关闭时站点生成禁止抓取规则；正式发布后检查 `/robots.txt` 与 `/sitemap.xml`。Sitemap 不应包含 `/shelf`、`/reader` 或本地导入书籍。
 
-`VITE_CONTACT_EMAIL` 设置真实可用的对外邮箱。运营主体、版权和适用地区信息由网站运营者根据真实情况补全，不要使用示例身份或虚构联系方式。
+## 自定义域名与 HTTPS
 
-## 独立域名与 HTTPS
+1. 打开 Pages 项目 **Custom domains → Set up a domain**，登记正式域名。
+2. Apex 域名需要 Cloudflare zone 与 Cloudflare nameservers；子域名可按面板指示配置 DNS。不要只添加 CNAME 而跳过 Pages 项目内的域名登记。
+3. 等待证书状态正常后，用 `https://` 打开域名；再将 `VITE_SITE_URL` 设置为唯一正式 canonical 域名。
+4. 如同时提供 `www` 和 apex 域名，选择一个主域并配置重定向。
 
-1. 在 Cloudflare Dashboard 打开 **Workers & Pages → 目标 Pages 项目 → Custom domains → Set up a domain**，添加真实域名。
-2. Apex 域名需要将域名作为 Cloudflare zone 并使用 Cloudflare nameservers；子域名可以在 DNS 提供商添加 CNAME 指向 `<项目名>.pages.dev`。仍需先在 Pages 项目中登记该自定义域名，不能只创建 CNAME。
-3. 等待 Pages 为域名签发并启用 HTTPS 证书；确认 `https://` 可用后再设置 `VITE_SITE_URL` 和打开索引开关。
-4. 如需 `www` 与 apex 统一，单独配置重定向并确认 canonical URL 只使用一个主域名。
+`public/_headers` 为静态资源设置安全响应头。HSTS 使用 `includeSubDomains`；确认所有子域名均支持 HTTPS 后再使用该策略。
 
-Pages 会按 `public/_headers` 提供基础安全响应头。HSTS 包含 `includeSubDomains`；如果域名下有尚未启用 HTTPS 的子域名，先移除此标记或确认它们也支持 HTTPS，再上线。
+## 路由、资源和上线验收
 
-## SPA 路由刷新验证
+Pages 项目需保留 SPA 回退能力；仓库不生成顶级 `404.html`，并为公共页面生成带 SEO metadata 的静态 HTML。完成部署后直接访问并刷新：
 
-Pages 在没有顶级 `404.html` 时会把未匹配路由交给 SPA；仓库没有创建 `404.html`。构建还会为公开页面生成带独立 SEO metadata 的静态 HTML。发布后直接打开并刷新以下 URL，确认返回对应页面而非 404：
+- `/about/`、`/guide/`、`/category/`、`/articles/reading-guide/`
+- 存在审核通过的公开书籍时，检查 `/books/<slug>/`
+- `/shelf/`、`/reader/<book-id>` 应由应用接管，并保持 `noindex` / 不进入 sitemap
+- `/robots.txt`、`/sitemap.xml`、`/ads.txt`
+- 配置后检查 `/admin`、`/api/admin/session` 与 `/api/public/catalog`；未登录的管理员 API 应拒绝请求，草稿正文不得通过公开接口读取
 
-- `/about/`
-- `/guide/`
-- `/category/`
-- `/articles/reading-guide/`
-- 有审核通过内容时的 `/books/<slug>/`
-- `/shelf/` 和 `/reader/<book-id>` 应由应用接管，但不应被索引
+本地生产预览可运行 `npm run start`，只服务 `dist` 并提供应用路由回退。Cloudflare 发布后检查手机 Safari 与桌面直接刷新路由、HTTPS、安全响应头及浏览器控制台。上线前其余检查见 [PRELAUNCH_CHECKLIST.md](./PRELAUNCH_CHECKLIST.md)。
 
-生产预览也可用 `npm run start` 检查，它只服务 `dist` 且对应用路由回退到入口。确认响应中 `/shelf/` 带 `noindex,nofollow`，阅读路由由 `robots.txt` 禁止抓取。
+## ads.txt
 
-## ads.txt 验证
-
-当前 `public/ads.txt` 只包含说明注释，不含虚构卖方声明。只有广告平台批准站点并提供正式声明后，才将平台原文加入该文件。部署后访问 `https://你的真实域名/ads.txt`，确认返回纯文本、状态码 200，并与账号中的 `ads.txt` 状态核对。具体 AdSense 发布商声明格式与回查时间以 [Google 官方 ads.txt 指南](https://support.google.com/adsense/answer/12171612?hl=zh-Hans) 为准。
-
-## 上线后快速复核
-
-- 检查首页、书架、公共目录和隐私/服务条款页面。
-- 检查手机 Safari 与桌面直接刷新路由。
-- 选取一份自有 TXT 导入，确认设备网络请求没有上传文件正文。
-- 检查 HTTPS、安全响应头、`robots.txt`、`sitemap.xml` 和 `/ads.txt`。
-- 按 [PRELAUNCH_CHECKLIST.md](./PRELAUNCH_CHECKLIST.md) 完成内容权利、经营许可、CMP 与运营信息核验。
+当前 `public/ads.txt` 仅含说明注释，不含虚构卖方声明。只有广告平台审核通过并提供正式内容后，才将原始授权行加入该文件。部署后打开 `https://你的正式域名/ads.txt`，检查状态码为 200、返回内容与账号提供的记录一致，再到广告平台确认回抓状态。参阅 [Google ads.txt 指南](https://support.google.com/adsense/answer/12171612?hl=zh-Hans) 和 [AD_MONETIZATION.md](./AD_MONETIZATION.md)。
