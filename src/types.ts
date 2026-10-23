@@ -64,8 +64,8 @@ export interface PublicCatalogMetadata {
   title: string;
   author?: string;
   dynasty?: string;
-  textForm?: '简体' | '繁体';
-  editionType?: '古籍 TXT' | '校勘本' | '原版影印';
+  textForm?: '简体' | '繁体' | '';
+  editionType?: '古籍 TXT' | '校勘本' | '原版影印' | '';
   baseEdition?: string;
   fullTextConfirmed?: boolean;
   originalSource?: string;
@@ -76,16 +76,11 @@ export interface PublicCatalogMetadata {
   contentFile: string;
   /** Original uploaded filename used by the build script to resolve draft sources. */
   sourceFile?: string;
-  dynasty?: string;
-  textForm?: '简体' | '繁体' | '';
-  editionType?: '古籍 TXT' | '校勘本' | '原版影印' | '';
-  baseEdition?: string;
-  fullTextConfirmed?: boolean;
-  originalSource?: string;
-  publicLicense?: string;
 }
 
-export interface PublicCatalogBook extends PublicCatalogMetadata {
+export interface PublicCatalogBook extends Omit<PublicCatalogMetadata, 'textForm' | 'editionType'> {
+  textForm?: '简体' | '繁体';
+  editionType?: '古籍 TXT' | '校勘本' | '原版影印';
   status: 'approved';
   rightsConfirmed: true;
   commercialRightsConfirmed: true;
