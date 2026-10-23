@@ -23,6 +23,10 @@ export async function parseTxtFile(file: File) {
   return parseWithWorker({ buffer }, [buffer]);
 }
 
+export function parseBufferInWorker(buffer: ArrayBuffer) {
+  return parseWithWorker({ buffer }, [buffer]);
+}
+
 export function parseTextInWorker(text: string) {
   return parseWithWorker({ text });
 }
