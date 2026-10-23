@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { BookOpenText, ChevronRight, Library, Settings2 } from 'lucide-react';
+import { BookOpenText, ChevronRight, Library, Search, Settings2 } from 'lucide-react';
 import { Link, NavLink, Outlet } from 'react-router-dom';
 import { readPrivacyPreferences, savePrivacyPreferences } from '../services/privacyConsent';
 import { applySeo } from './seo';
@@ -32,9 +32,11 @@ export default function SiteLayout() {
       <Link className={styles.brand} to="/" aria-label="古籍阅读首页"><span className={styles.brandIcon}><BookOpenText size={20} /></span><span>古籍阅读<small>本地优先 · 安心阅读</small></span></Link>
       <nav className={styles.nav} aria-label="主导航">
         <NavLink to="/category">公共书库</NavLink>
+        <NavLink to="/articles">古籍导读</NavLink>
         <NavLink to="/guide">阅读指南</NavLink>
         <NavLink to="/about">关于</NavLink>
       </nav>
+      <Link className={styles.searchButton} to="/search" aria-label="搜索书籍与导读"><Search size={18} /><span>搜索</span></Link>
       <Link className={styles.shelfButton} to="/shelf"><Library size={17} />我的书架</Link>
     </header>
 
@@ -51,7 +53,7 @@ export default function SiteLayout() {
     <div id="main-content"><Outlet /></div>
     <footer className={styles.footer}>
       <div className={styles.footerBrand}><BookOpenText size={19} /><span>古籍阅读<small>把喜欢的文字，留在自己的设备上。</small></span></div>
-      <nav aria-label="页脚导航"><Link to="/guide">阅读指南</Link><Link to="/about">关于我们</Link><Link to="/contact">联系我们</Link><Link to="/privacy">隐私政策</Link><Link to="/terms">服务条款</Link></nav>
+      <nav aria-label="页脚导航"><Link to="/articles">古籍导读</Link><Link to="/search">搜索</Link><Link to="/guide">阅读指南</Link><Link to="/about">关于我们</Link><Link to="/contact">联系我们</Link><Link to="/privacy">隐私政策</Link><Link to="/terms">服务条款</Link></nav>
       <button className={styles.privacyLink} onClick={() => setPrivacyOpen(true)}>隐私偏好 <ChevronRight size={15} /></button>
       <small className={styles.footerNote}>本地导入内容仅保存在你的浏览器中。公共书库只展示经审核的内容。</small>
     </footer>
