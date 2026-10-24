@@ -419,7 +419,7 @@ export default function ReaderPage({ settings, onSettingsChange, notify }: Reade
       <button className={styles.iconButton} onClick={() => handleTool('type')} aria-label="排版设置" title="排版"><Settings2 size={19} /></button>
     </header>
 
-    <section className={styles.readingStage} onKeyDown={handlePageKeys} tabIndex={0} aria-label="阅读页面">
+    <section className={`${styles.readingStage} ${chromeVisible ? styles.chromeShown : ''}`} onKeyDown={handlePageKeys} tabIndex={0} aria-label="阅读页面">
       <div className={styles.paper} onPointerDown={handlePointerDown} onPointerMove={handlePointerMove} onPointerUp={handlePointerUp} onPointerCancel={() => { if (longPressTimer.current) window.clearTimeout(longPressTimer.current); pointerOrigin.current = null; }} onContextMenu={(event) => event.preventDefault()}>
         <div className={styles.readingScroll} ref={scrollRef} onScroll={handleScroll}>
           <article className={`${styles.prose} ${currentChapter.locked ? styles.lockedProse : ''}`}>
