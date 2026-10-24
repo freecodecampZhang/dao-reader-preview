@@ -48,9 +48,11 @@ for (const item of candidates) {
   if (typeof item.category !== 'string' || !item.category.trim() || !slugPattern.test(item.categorySlug || '')) continue;
   if (item.contentFile !== `library/${item.slug}.txt`) continue;
   const sourceFile = item.sourceFile ?? `${item.slug}.txt`;
-  if (typeof sourceFile !== 'string' || sourceFile !== path.basename(sourceFile) || sourceFile.includes('/') || sourceFile.includes('\\') || !/\.txt$/i.test(sourceFile)) continue;
+  const sourceParts = typeof sourceFile === 'string' ? sourceFile.split('/') : [];
+  if (!sourceParts.length || sourceParts.some((part) => !part || part === '.' || part === '..' || /[<>:"|?*\u0000-\u001f]/.test(part))
+    || sourceFile.includes('\\') || path.posix.isAbsolute(sourceFile) || !/\.txt$/i.test(sourceFile)) continue;
   if (item.status !== 'approved' || item.rightsConfirmed !== true || item.commercialRightsConfirmed !== true || item.publicationApproved !== true) continue;
-  try { await readFile(path.join(publicRoot, 'library', sourceFile)); } catch { continue; }
+  try { await readFile(path.join(publicRoot, 'library', ...sourceParts)); } catch { continue; }
   seen.add(item.slug);
   approved.push({ item: { ...item }, sourceFile });
 }
@@ -61,7 +63,8 @@ const outLibrary = path.join(dist, 'library');
 await rm(outLibrary, { recursive: true, force: true });
 for (const { item, sourceFile } of approved) {
   await mkdir(outLibrary, { recursive: true });
-  await copyFile(path.join(publicRoot, 'library', sourceFile), path.join(outLibrary, `${item.slug}.txt`));
+  const sourceParts = sourceFile.split('/');
+  await copyFile(path.join(publicRoot, 'library', ...sourceParts), path.join(outLibrary, `${item.slug}.txt`));
 }
 const publicBooks = approved.map(({ item }) => {
   const { sourceFile: _sourceFile, ...book } = item;

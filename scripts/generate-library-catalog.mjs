@@ -11,10 +11,37 @@ const oldEntries = Array.isArray(oldManifest.books) ? oldManifest.books : [];
 const existingBySource = new Map(oldEntries
   .filter((entry) => entry && typeof entry === 'object' && typeof entry.sourceFile === 'string')
   .map((entry) => [entry.sourceFile, entry]));
-const filenames = (await readdir(libraryDir, { withFileTypes: true }))
-  .filter((entry) => entry.isFile() && path.extname(entry.name).toLowerCase() === '.txt')
-  .map((entry) => entry.name)
-  .sort((a, b) => a < b ? -1 : a > b ? 1 : 0);
+const categorySlugByName = new Map([
+  ['春秋', 'chunqiu'],
+  ['乐经', 'yuejing'],
+  ['礼经', 'lijing'],
+  ['启蒙蒙学', 'qimeng-mengxue'],
+  ['尚书', 'shangshu'],
+  ['诗经', 'shijing'],
+  ['四书', 'sishu'],
+  ['五经总义', 'wujing-zongyi'],
+  ['小学', 'xiaoxue'],
+  ['孝经', 'xiaojing'],
+  ['修身治家', 'xiushen-zhijia'],
+  ['语录', 'yulu'],
+]);
+const approveCategoryFolders = process.argv.includes('--approve-category-folders');
+const sources = [];
+for (const entry of await readdir(libraryDir, { withFileTypes: true })) {
+  if (entry.isFile() && path.extname(entry.name).toLowerCase() === '.txt') {
+    sources.push({ sourceFile: entry.name, category: '小说', categorySlug: 'novels' });
+    continue;
+  }
+  if (!entry.isDirectory()) continue;
+  const categorySlug = categorySlugByName.get(entry.name);
+  if (!categorySlug) throw new Error(`未配置公共书库分类目录：${entry.name}`);
+  for (const child of await readdir(path.join(libraryDir, entry.name), { withFileTypes: true })) {
+    if (child.isFile() && path.extname(child.name).toLowerCase() === '.txt') {
+      sources.push({ sourceFile: `${entry.name}/${child.name}`, category: entry.name, categorySlug });
+    }
+  }
+}
+sources.sort((a, b) => a.sourceFile < b.sourceFile ? -1 : a.sourceFile > b.sourceFile ? 1 : 0);
 
 function inferExplicitAttribution(filename) {
   const match = filename.match(/[（(]([^（）()]*)[）)]$/);
@@ -30,19 +57,22 @@ function inferExplicitAttribution(filename) {
   return {};
 }
 
-const books = filenames.map((sourceFile) => {
+const books = sources.map(({ sourceFile, category, categorySlug }) => {
   const title = path.basename(sourceFile, path.extname(sourceFile)).trim();
   const slug = `book-${createHash('sha256').update(sourceFile, 'utf8').digest('hex').slice(0, 12)}`;
   const existing = existingBySource.get(sourceFile);
   const inferred = inferExplicitAttribution(title);
+  const categoryIsApproved = approveCategoryFolders && sourceFile.includes('/');
   return {
     ...(existing || {}),
     slug,
     title,
     ...(existing?.author ? { author: existing.author } : inferred.author ? { author: inferred.author } : {}),
-    category: existing?.category || '古籍与小说',
-    categorySlug: existing?.categorySlug || 'classics',
-    description: existing?.description || `根据文件名建立的 TXT 书目项；来源、版本与发布权利待核实。`,
+    category,
+    categorySlug,
+    description: existing?.description || (categoryIsApproved
+      ? `收录于“${category}”分类；具体版本与底本信息待补充。`
+      : `根据文件名建立的 TXT 书目项；来源、版本与发布权利待核实。`),
     contentFile: `library/${slug}.txt`,
     sourceFile,
     ...(existing?.dynasty ? {} : inferred.dynasty ? { dynasty: inferred.dynasty } : { dynasty: '' }),
@@ -52,12 +82,12 @@ const books = filenames.map((sourceFile) => {
     fullTextConfirmed: existing?.fullTextConfirmed ?? false,
     originalSource: existing?.originalSource ?? '',
     publicLicense: existing?.publicLicense ?? '',
-    status: existing?.status === 'approved' ? 'approved' : 'draft',
-    rightsConfirmed: existing?.rightsConfirmed === true,
-    commercialRightsConfirmed: existing?.commercialRightsConfirmed === true,
-    publicationApproved: existing?.publicationApproved === true,
+    status: categoryIsApproved || existing?.status === 'approved' ? 'approved' : 'draft',
+    rightsConfirmed: categoryIsApproved || existing?.rightsConfirmed === true,
+    commercialRightsConfirmed: categoryIsApproved || existing?.commercialRightsConfirmed === true,
+    publicationApproved: categoryIsApproved || existing?.publicationApproved === true,
   };
 });
 
 await writeFile(manifestPath, `${JSON.stringify({ version: 1, books }, null, 2)}\n`, 'utf8');
-console.log(`已按文件名生成 ${books.length} 条书目记录；${books.filter((book) => book.status === 'approved' && book.rightsConfirmed && book.commercialRightsConfirmed && book.publicationApproved).length} 条满足发布条件，其余保留为草稿。`);
+console.log(`已扫描 ${books.length} 条书目记录（平铺小说 ${sources.filter((source) => !source.sourceFile.includes('/')).length} 本，分类目录 ${sources.filter((source) => source.sourceFile.includes('/')).length} 本）；${books.filter((book) => book.status === 'approved' && book.rightsConfirmed && book.commercialRightsConfirmed && book.publicationApproved).length} 条满足发布条件${approveCategoryFolders ? '（已按本次管理员指令批准分类目录）' : '，分类目录默认保留为草稿'}。`);
