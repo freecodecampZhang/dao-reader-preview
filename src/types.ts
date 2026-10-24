@@ -78,9 +78,7 @@ export interface PublicCatalogMetadata {
   sourceFile?: string;
 }
 
-export interface PublicCatalogBook extends Omit<PublicCatalogMetadata, 'textForm' | 'editionType'> {
-  textForm?: '简体' | '繁体';
-  editionType?: '古籍 TXT' | '校勘本' | '原版影印';
+export interface PublicCatalogBook extends PublicCatalogMetadata {
   status: 'approved';
   rightsConfirmed: true;
   commercialRightsConfirmed: true;

@@ -16,8 +16,8 @@ export function isApprovedPublicBook(value: unknown): value is PublicCatalogBook
     && book.commercialRightsConfirmed === true
     && book.publicationApproved === true
     && (book.dynasty === undefined || typeof book.dynasty === 'string')
-    && (book.textForm === undefined || book.textForm === '简体' || book.textForm === '繁体')
-    && (book.editionType === undefined || book.editionType === '古籍 TXT' || book.editionType === '校勘本' || book.editionType === '原版影印')
+    && (book.textForm === undefined || book.textForm === '' || book.textForm === '简体' || book.textForm === '繁体')
+    && (book.editionType === undefined || book.editionType === '' || book.editionType === '古籍 TXT' || book.editionType === '校勘本' || book.editionType === '原版影印')
     && (book.baseEdition === undefined || typeof book.baseEdition === 'string')
     && (book.fullTextConfirmed === undefined || typeof book.fullTextConfirmed === 'boolean')
     && (book.originalSource === undefined || typeof book.originalSource === 'string')

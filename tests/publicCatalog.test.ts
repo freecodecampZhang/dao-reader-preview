@@ -22,6 +22,12 @@ describe('public catalog release gate', () => {
     expect(isApprovedPublicBook({ ...approved, status: 'pending' })).toBe(false);
   });
 
+  it('accepts approved records with intentionally blank optional edition metadata', () => {
+    const book = { ...approved, textForm: '', editionType: '古籍 TXT' };
+    expect(isApprovedPublicBook(book)).toBe(true);
+    expect(filterApprovedBooks([book])).toEqual([book]);
+  });
+
   it('rejects unsafe paths, invalid slugs, incomplete records, and duplicates', () => {
     const unsafe = { ...approved, contentFile: '../../secret.txt' };
     const invalidSlug = { ...approved, slug: '../secret', contentFile: 'library/../secret.txt' };
